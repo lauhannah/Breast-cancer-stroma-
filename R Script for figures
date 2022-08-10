@@ -1,0 +1,41 @@
+####### Loading of datasets ######
+##load metadata of all samples
+Metadata_all_samples <- read.csv("file.location/Metadata_all_samples.csv")
+head(Metadata_all_samples)
+
+##load expression data of all samples
+#Processed data has samples labelled by ID instead of CEL file
+#Rows with NA gene symbol removed (3 rows removed - 17504 genes remaining)
+Processed_expr_all_samples <- read.csv("file.location/Processed_expr_all_samples.csv", row.names=1)
+Metadata_all_samples<-Metadata_all_samples[order(match(Metadata_all_samples$ID.site1,colnames(Processed_expr_all_samples))),] #order metadata rows according to sample order in expr file
+colnames(Processed_expr_all_samples)<-Metadata_all_samples$ID.site #relabel colnames to match metadata
+dim(Processed_expr_all_samples) #check dimensions - 17504 genes, 144 samples
+
+##Create metadata and expression data for tumour samples only
+Tum_samples<-subset(Metadata_all_samples,Tissue=="T")
+dim(Tum_samples) #check 47 tumour samples
+Tum_samples$ID<-factor(Tum_samples$ID,levels=c("BC1","BC2","BC3","BC4","BC5","BC6","BC7","BC8","BC9","BC10"))
+head(Tum_samples)
+
+expr_tum<-Processed_expr_all_samples[,which(colnames(Processed_expr_all_samples) %in% Tum_samples$ID.site)]
+dim(expr_tum) #check 47 tumour samples
+
+##Create metadata and expression data for stroma samples only
+St_samples<-subset(Metadata_all_samples,Tissue=="St")
+dim(St_samples) #check 82 stroma samples
+St_samples$ID<-factor(St_samples$ID,levels=c("BC1","BC2","BC3","BC4","BC5","BC6","BC7","BC8","BC9","BC10"))
+head(St_samples)
+
+expr_St<-Processed_expr_all_samples[,which(colnames(Processed_expr_all_samples) %in% St_samples$ID.site)]
+dim(expr_St) #check 82 stroma samples
+
+##Create metadata and expression data for stroma+NTB samples only
+St_NTB_samples<-subset(Metadata_all_samples,Tissue=="St"|Tissue=="NTB" )
+dim(St_NTB_samples) #check 97 samples
+St_NTB_samples$ID<-factor(St_NTB_samples$ID,levels=c("BC1","BC2","BC3","BC4","BC5","BC6","BC7","BC8","BC9","BC10","N1","N2","N3"))
+head(St_NTB_samples)
+
+expr_St_NTB<-Processed_expr_all_samples[,which(colnames(Processed_expr_all_samples) %in% St_NTB_samples$ID.site)]
+dim(expr_St_NTB) #check 97 samples
+
+######################################
